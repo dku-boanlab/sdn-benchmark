@@ -4,6 +4,7 @@
 - POX (in Mininet)  
 - Ryu  
 - SE-Floodlight
+- ONOS
 
 # Network emulation
 - Mininet
