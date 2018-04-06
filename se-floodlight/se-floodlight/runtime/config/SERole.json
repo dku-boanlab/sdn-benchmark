@@ -1,0 +1,6 @@
+{
+  "admin":		65535,
+  "privileged": 43690,
+  "ofapp":		21845,
+  "none":	   	   -1
+}

@@ -1,0 +1,103 @@
+
+			
+				<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+				<html>
+				<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+				<title>Security Enhanced Floodlight</title>
+				</head>
+				<body>
+			
+			<h2>Preliminaries</h2>
+
+<p>If you haven't already done so, please read the <a href="LICENSE.html" title="End-User License">EULA</a>.</p>
+
+<h2>Contents</h2>
+
+<p>This distribution includes</p>
+
+<ul>
+<li>A pre-built SEFloodlight runtime,</li>
+<li>An audit subsystem,</li>
+<li>An OpenFlow NorthboundAPI, and</li>
+<li>Associated documentation, utilities, and development components.</li>
+</ul>
+
+<h2>Pre-Configuration</h2>
+
+<p>We highly recommend that you configure your OpenFlow switch to run
+in secure mode (cf., running as a "dumb" switch when disconnected
+from an OpenFlow controller).</p>
+
+<p>For example, for Open vSwitch,</p>
+
+<p><code>&nbsp; &nbsp; ovs-vsctl set-fail-mode </code><em>bridge</em><code> secure</code></p>
+
+<p>configures the switch to not set up flows on its own when the controller
+connection fails.</p>
+
+<h2>Quick Start</h2>
+
+<p>The following will start the SEFloodlight controller:</p>
+
+<pre><code>    cd runtime
+    java -jar SEFloodlight.jar
+</code></pre>
+
+<p>Alternatively, for *nix-based systems, you can enter</p>
+
+<pre><code>    cd runtime
+    ./sefloodlight.sh
+</code></pre>
+
+<p>For information on floodlight, go <a href="http://floodlight.openflowhub.org/" title="Floodlight">here</a>.</p>
+
+<h2>SEFloodlight Overview</h2>
+
+<ul>
+<li>This is an enhanced version of the Floodlight OpenFlow controller that
+<a href="doc/config/SEFloodlight/index.html" title="SEFloodlight">provides and enforces privilege-based OpenFlow operations</a>.</li>
+<li>SEFloodlight allows capture of controller <a href="doc/config/AuditDaemon/index.html" title="OpenFlow Audit Events">OpenFlow audit events</a>
+for real-time or batch processing.</li>
+<li>This controller also integrates <a href="doc/config/SENorthboundAPI/NorthboundAPI.html" title="OpenFlow Northbound API">SRI's OpenFlow Northbound API floodlight module</a> (which communicates with external applications via Google Protocol Buffers
+messages). This API provides complete access to both asynchronous and synchronous
+OpenFlow controller-to-switch messages, and also provides additional convenience methods.</li>
+</ul>
+
+<h2>New Features</h2>
+
+<p>This release of SEFloodlight</p>
+
+<ul>
+<li>Replaces the Alias-set Rule Reduction (ARR) algorithm with the more
+comprehensive and efficient Rule-chain Conflict Analysis (RCA)
+algorithm (see the NDSS 2015 paper, "Securing the Software-Defined
+Network Control Layer", "IV. DESIGN OF A SECURE CONTROL MEDIATION
+LAYER").</li>
+<li>Implements flow-rule mediation among multiple OpenFlow switches using
+a <a href="doc/config/SEFloodlight/Interconnections.html" title="Interconnected OpenFlow Switches">JSON interconnection description file</a> (caveat emptor: this
+feature has not been well tested).</li>
+</ul>
+
+<h2>Sponsors and Acknowledgments</h2>
+
+<p>We gratefully acknowledge the support of the Defense Advanced Research
+Project (DARPA) Contract No. FA8750-11-C-0249 and the Army Research
+Office under the Cyber-TA Research Grant (No. W911NF-06-1-0316). Thank
+you to Howie Schrobe, Bob Ladaga, and Cliff Wang, for their program
+management support of basic research in Software Defined Network
+Security.</p>
+
+<h2>Release Information</h2>
+
+<pre><code>    Package build date: Saturday, February 21, 2015 01:16:37 UTC
+    Repository revision: 1993:1994M
+</code></pre>
+
+			
+				<br>
+				<br>
+				<i>Last modified: Friday, 20-Feb-2015 17:16 PST</i>
+				</body>
+			
+			

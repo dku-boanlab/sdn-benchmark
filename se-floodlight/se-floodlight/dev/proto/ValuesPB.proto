@@ -1,0 +1,55 @@
+syntax = "proto2";
+
+option java_package = "org.openflow.northboundapi.proto";
+
+import "SBOFActionsPB.proto";
+import "SBOFMatchesPB.proto";
+
+message InetSockAddrPB {
+  required bytes rawIP = 1;
+  optional int32 port  = 2;
+}
+
+message AddrInfoPB {
+  required int32          ai_flags     = 1;
+  required int32          ai_family    = 2;
+  required int32          ai_socktype  = 3;
+  required int32          ai_protocol  = 4;
+  required string         ai_canonname = 5;
+  repeated InetSockAddrPB sockaddr     = 6;
+}
+
+message HostEntPB {
+  required string         canonname = 1;
+  repeated string         alias     = 2;
+  repeated bytes          rawIP     = 3;
+}
+
+message ValuePB {
+
+  // Only one of the following should be specified
+  // If none are specified, null (N) is assumed
+
+  optional int32          anInt32   =  1; // I
+  optional int64          anInt64   =  2; // L
+  optional bool           aBool     =  3; // B
+  optional string         aString   =  4; // S
+  optional bytes          byteArray =  5; // b
+  optional InetSockAddrPB iSockAddr =  6; // i; InetSocketAddress
+  optional HostEntPB      hostEnt   =  7; // H; HostEnt
+  repeated AddrInfoPB     addrInfo  =  8; // a; AddrInfo
+  repeated ValuePB        aValue    =  9; // []; Object array
+  repeated NameValPB      dict      = 10; // d; dictionary
+  optional OFActionPB	  ofAction	= 11; // A
+  optional OFMatchPB	  ofMatch	= 12; // M
+}
+
+message NameValPB {
+  required ValuePB name  = 1;
+  required ValuePB value = 2;
+}
+
+
+//Local Variables:
+//tab-width: 4
+//End:

@@ -1,0 +1,338 @@
+<HTML>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+</head>
+<code>
+{<br>
+ &nbsp; &nbsp;"enabled": </code><i>boolean</i><code>,<br>
+<br>
+ &nbsp; &nbsp;"outputFile": </code><i>&lt;audit GPB output file&gt;</i><code>,<br>
+<br>
+ &nbsp; &nbsp;"queueConfig": {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"highWaterMark": </code><i>integer</i><code>,<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"lowWaterMark" : </code><i>integer</i><code>,<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"discardOldest": </code><i>boolean</i><code>,<br>
+<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"recoveryStrategy": </code><i>&lt;recoveryStrategy&gt;</i><code>,<br>
+<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"prune": </code><i>&lt;filter&gt;</i>+<code><br>
+ &nbsp; &nbsp;},<br>
+<br>
+ &nbsp; &nbsp;"log": {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"defaultPolicy": </code><i>&lt;defaultPolicy&gt;</i><code>,<br>
+<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"filter": </code><i>&lt;filter&gt;</i>+<code><br>
+ &nbsp; &nbsp;}<br>
+}<br>
+</code>
+<br>
+where<br>
+<br>
+ &nbsp;<i>&lt;recoveryStrategy&gt;</i> is <code>"drop"</code> or <code>"halt"</code> (default: <code>"drop"</code>),<br>
+<br>
+ &nbsp;<i>&lt;defaultPolicy&gt;</i> is <code>"forward"</code> or <code>"drop"</code> (default: <code>"forward"</code>), and<br>
+<br>
+ &nbsp;<i>&lt;filter&gt;</i> is a JSON object specifying audit events to ignore (<i>&lt;defaultPolicy&gt;</i> &#8801; <code>"forward"</code>)
+ or write (<i>&lt;defaultPolicy&gt;</i> &#8801; <code>"drop"</code>).
+It has the following optional keys:<br>
+<br>
+<code>
+ &nbsp; &nbsp;{<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"Event": [{"datapathID": </code><i>long</i><code>,<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; "OFMessage": {<i>&lt;</code>OFtypeMatch&gt;</i>+<code>},<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; "detail.<i>&lt;dKey&gt;</i>": <i></code>string</i>+<code><br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}</code>+<code>,<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</code><i>&lt;category&gt;</i>+<code><br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ],<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"Subjects": </code><i>&lt;agentID&gt;</i>+<code>,<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;"Disposition": </code><i>&lt;disposition&gt;</i><code>+<br>
+ &nbsp; &nbsp;}</code><br>
+<br>
+ &nbsp; &nbsp; &nbsp;<i>&lt;OFtypeMatch&gt;</i> is either<br>
+<br>
+<div style="margin-left: 40px;">
+<i>&lt;OFtype&gt;</i><code>: null</code><br>
+<br>
+<code> &nbsp;</code>or<br>
+<br>
+<i>&lt;OFtype&gt;</i><code>: </code><i>&lt;selectFilter&gt;</i><br>
+<br>
+and <i>&lt;OFtype&gt;</i> is a quoted OpenFlow message type (e.g., <code>"FLOW_MOD"</code>,
+ <code>"STATS_REPLY"</code>, etc.; these correspond to the <code>enum ofp_types</code> in the
+ OpenFlow Specification, where the &ldquo;<code>OFPT_</code>&rdquo; prefix is elided). (See
+ below for a description of <i>&lt;selectFilter&gt;</i>.)<br>
+</div><br>
+<div style="margin-left: 20px;">
+<i>&lt;dKey&gt;</i> is <code>"category"</code>, <code>"clientID"</code>, <code>"group"</code>, or
+<code>"memberID"</code>,<br>
+<br>
+<i>&lt;category&gt;</i> is <code>"AuditKernel"</code>, <code>"SEKernel"</code>, <code>"authenticate"</code>, or
+ <code>"OF"</code>, and<br>
+<br>
+<i>&lt;disposition&gt;</i>
+is <code>"info"</code>, <code>"warning"</code>,
+or <code>"error"</code>.
+</div>
+<br>
+Notes:<br>
+<ul>
+<li><code>"outputFile"</code> may only be queried, and not set, via the REST API.</li>
+<li>For all JSON values with the form <i>&lt;item&gt;</i>+, multiple items must be specified
+ in a homogeneous JSON list (viz., delimited by &lsquo;<code>[</code>&rsquo; and &lsquo;<code>]</code>&rsquo;
+ and comma separated).</li>
+<li>The filters in the optional <code>queueConfig.prune</code> array specify which records
+ to selectively discard when the audit kernel's output queue becomes full.
+ Note that these filters are evaluated breadth-first against the output
+ queue records. &nbsp;Thus the filters should be ordered from least to most significant.</li>
+<li>The dictionary elements in the optional <code>log.filter[i].Event[j]</code> array specify
+ which records to keep or discard, contingent upon <code>"log.defaultPolicy"</code>.</li>
+<li><i>&lt;selectFilter&gt;</i> is an OFMessage-specific JSON object/associative array with
+these structure-specific fields:</li>
+<br>
+
+<table style="text-align: left; margin-left: 0px;" border="1"
+cellpadding="2" cellspacing="1">
+<tbody>
+<tr>
+<td style="text-align: center;"><b>OFType</b></td><td style="text-align: center;"><b>Optional Field Selectors</b></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"ERROR"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 18%;"><code>"type"</code></td><td><code>"OFPET_HELLO_FAILED"</code>,
+<code>"OFPET_BAD_REQUEST"</code>, <code>"OFPET_BAD_ACTION"</code>, <code>"OFPET_FLOW_MOD_FAILED"</code>,
+<code>"OFPET_PORT_MOD_FAILED"</code>, <code>"OFPET_QUEUE_OP_FAILED"</code>, or <code>"OFPET_VENDOR_ERROR"</code></td></tr>
+<tr>
+<td style="text-align: center;"><code>"code"</code></td><td><code>"OFPHFC_</code><i>&lt;string&gt;</i><code>"</code>,
+<code>"OFPBRC_</code><i>&lt;string&gt;</i><code>"</code>, <code>"OFPBAC_</code><i>&lt;string&gt;</i><code>"</code>,
+<code>"OFPFMFC_</code><i>&lt;string&gt;</i><code>"</code>, <code>"OFPPMFC_</code><i>&lt;string&gt;</i><code>"</code>,
+or <code>"OFPQOFC_</code><i>&lt;string&gt;</i><code>"</code>
+<br><i>See </i><code>src/main/java/org/openflow/protocol/OFError.java</code> <i>for complete list.</i>
+</td></tr>
+<tr>
+<td style="text-align: center;"><code>"match"</code></td><td><i>&lt;OFMatch&gt;</i></td></tr>
+</tbody></table></td>
+</tr>
+
+<tr>
+<td style="text-align: center;"><code>"FLOW_MOD"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 18%;"><code>"command"</code></td><td><code>"OFPFC_ADD"</code>, or
+<code>"OFPFC_MODIFY"</code>, <code>"OFPFC_MODIFY_STRICT"</code>, <code>"OFPFC_DELETE"</code>, or
+<code>"OFPFC_DELETE_STRICT"</code></td></tr>
+<tr>
+<td style="text-align: center;"><code>"match"</code></td><td><i>&lt;OFMatch&gt;</i></td></tr><tr>
+<td style="text-align: center;"><code>"out_port"</code></td><td>integer</td></tr>
+</tbody></table></td>
+</tr>
+
+<tr>
+<td style="text-align: center;"><code>"FLOW_REMOVED"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 18%;"><code>"reason"</code></td><td style="width: 520 px;"><code>"OFPRR_IDLE_TIMEOUT"</code>,
+<code>"OFPRR_HARD_TIMEOUT"</code>, or <code>"OFPRR_DELETE"</code></td></tr>
+<tr>
+<td style="text-align: center;"><code>"match"</code></td><td><i>&lt;OFMatch&gt;</i></td></tr>
+</tbody></table></td>
+</tr>
+
+<tr>
+<td style="text-align: center;"><code>"PACKET_IN"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<td style="text-align: center;"><code>"in_port"</code></td><td>integer</td></tr>
+<tr>
+<td style="text-align: center; width: 18%;"><code>"reason"</code></td><td style="width: 520 px;"><code>"NO_MATCH"</code>
+or <code>"ACTION"</code></td></tr>
+<tr>
+<td style="text-align: center;"><code>"match"</code></td><td><i>&lt;OFMatch&gt;</i></td></tr>
+</tbody></table></td>
+</tr>
+
+<tr>
+<td style="text-align: center;"><code>"PACKET_OUT"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<td style="text-align: center; width: 18%;"><code>"in_port"</code></td><td style="width: 520 px;">integer</td></tr>
+<td style="text-align: center;"><code>"match"</code></td><td><i>&lt;OFMatch&gt;</i></td></tr>
+</tbody></table></td>
+</tr>
+
+<tr>
+<td style="text-align: center;"><code>"PORT_MOD"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<td style="text-align: center; width: 18%;"><code>"port_no"</code></td><td style="width: 520 px;">integer</td></tr>
+</tbody></table></td>
+</tr>
+
+<tr>
+<td style="text-align: center;"><code>"PORT_STATUS"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 18%;"><code>"reason"</code></td><td style="width: 520 px;"><code>"OFPPR_ADD"</code>,
+<code>"OFPPR_DELETE"</code>, or <code>"OFPPR_MODIFY"</code></td></tr>
+</tbody></table></td>
+</tr>
+
+<tr>
+<td style="text-align: center;"><code>"QUEUE_GET_CONFIG_REPLY"<br>"QUEUE_GET_CONFIG_REQUEST"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<td style="text-align: center; width: 18%;"><code>"port"</code></td><td style="width: 520 px;">integer</td></tr>
+</tbody></table></td>
+</tr>
+
+<tr>
+<td style="text-align: center;"><code>"STATS_REPLY"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 18%;"><code>"type"</code></td><td style="width: 520 px;">
+
+<table width="100%" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 35%;"><b>Type</b></td><td style="text-align: center;"><b>Optional Field Selectors</b></td></tr>
+<tr>
+<td style="text-align: center;"><code>"DESC"</code></td><td><i>none</i></td></tr>
+<tr>
+<td style="text-align: center;"><code>"FLOW"<br>"AGGREGATE"</code></td>
+<td><table width="100%" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 35%;"><code>"match"</code></td><td style="width: 520 px;"><i>&lt;OFMatch&gt;</i></td></tr>
+<tr>
+<td style="text-align: center;"><code>"table_id"</code></td><td>integer</td></tr>
+<tr>
+<td style="text-align: center;"><code>"out_port"</code></td><td>integer</td></tr>
+</tbody></table></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"TABLE"</code></td>
+<td><table width="100%" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 35%;"><code>"table_id"</code></td><td style="width: 520 px;">integer</td></tr>
+</tbody></table></td></tr>
+<tr>
+<td style="text-align: center;"><code>"PORT"<br>"QUEUE"</code></td>
+<td><table width="100%" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 35%;"><code>"port_no"</code></td><td style="width: 520 px;">integer</td></tr>
+</tbody></table></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"VENDOR"</code></td><td><i>none</i></td></tr>
+
+</tbody></table>
+
+</td></tr>
+</tbody></table></td>
+</tr>
+
+<tr>
+<td style="text-align: center;"><code>"STATS_REQUEST"</code></td>
+<td><table width="520 px" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 18%;"><code>"type"</code></td><td style="width: 520 px;">
+
+<table width="100%" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 35%;"><b>Type</b></td><td style="text-align: center;"><b>Optional Field Selectors</b></td></tr>
+<tr>
+<td style="text-align: center;"><code>"OFPST_DESC"</code></td><td><i>none</i></td></tr>
+<tr>
+<td style="text-align: center;"><code>"OFPST_FLOW"<br>"OFPST_AGGREGATE"</code></td>
+<td><table width="100%" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 35%;"><code>"match"</code></td><td style="width: 520 px;"><i>&lt;OFMatch&gt;</i></td></tr>
+<tr>
+<td style="text-align: center;"><code>"table_id"</code></td><td>integer</td></tr>
+<tr>
+<td style="text-align: center;"><code>"out_port"</code></td><td>integer</td></tr>
+</tbody></table></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"OFPST_TABLE"</code></td>
+<td><table width="100%" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 35%;"><code>"table_id"</code></td><td style="width: 520 px;">integer</td></tr>
+</tbody></table></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"OFPST_PORT"<br>"OFPST_QUEUE"</code></td>
+<td><table width="100%" border="1" cellpadding="2" cellspacing="0"><tbody>
+<tr>
+<td style="text-align: center; width: 35%;"><code>"port_no"</code></td><td style="width: 520 px;">integer</td></tr>
+</tbody></table></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"OFPST_VENDOR"</code></td><td><i>none</i></td></tr>
+
+</tbody></table>
+
+</td></tr>
+</tbody></table></td>
+</tr>
+
+</tbody>
+</table>
+<br>
+For OFType <code>ERROR</code>, <code>FLOW_MOD</code>, <code>FLOW_REMOVED</code>,
+ <code>PACKET_IN</code>, and <code>PACKET_OUT</code>, <i>&lt;OFMatch&gt;</i>
+is a JSON object with these optional keys and values (again, with JSON lists
+as containers for multiple values):<br>
+<br>
+<table style="text-align: left; margin-left: 0px;" border="1"
+cellpadding="2" cellspacing="1">
+<tbody>
+<tr>
+<td style="text-align: center;"><b>Key</b></td><td style="text-align: center;"><b>Value</b></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"inputPort"</code></td><td>integer</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"dataLayerSource"</code></td><td>quoted string with 6 pairs
+    of colon-delimited octets</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"dataLayerDestination"</code></td><td>quoted string with 6
+    pairs of colon-delimited octets</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"dataLayerVirtualLan"</code></td><td>integer</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"dataLayerVirtualLanPriorityCodePoint"</code></td><td>integer</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"dataLayerType"</code></td><td>integer,
+    quoted <code>0x</code>-prefixed hexadecimal string, or a quoted<br>
+    string (e.g., <code>"ARP"</code>, <code>"IP"</code>, etc.)</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"networkTypeOfService"</code></td><td>integer or quoted
+    string
+    (viz., <code>"lowDelay"</code>, <code>"throughput"</code>,<br><code>"reliability"</code>,
+    or <code>"minCost"</code>)</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"networkProtocol"</code></td><td>integer or quoted
+string (e.g., <code>"ICMP"</code>, <code>"TCP"</code>, <code>"UDP"</code>,
+etc.)</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"networkSource"</code></td><td>integer or quoted CIDR
+    string</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"networkDestination"</code></td><td>integer or quoted CIDR
+    string</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"transportSource"</code></td><td>port number</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>"transportDestination"</code></td><td>port number</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</HTML>

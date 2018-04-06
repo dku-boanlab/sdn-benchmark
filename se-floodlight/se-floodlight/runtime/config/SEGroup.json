@@ -1,0 +1,30 @@
+{
+  "admin": {
+    "role":	    	"admin",
+    "capabilities": ["$adminPriv"],
+    "members":	    ["admin"]
+  },
+
+  "privileged": {
+    "role":	    	"privileged",
+    "capabilities": ["$opPriv"],
+    "members":	    []
+  },
+
+  "packetOut": {
+    "role":	    	"ofapp",
+    "capabilities": ["$opPriv"],
+    "members":	    ["packetOut"]
+  },
+
+  "ofapp": {
+    "role":	    	"ofapp",
+    "capabilities": ["$appPriv"],
+    "members":	    []
+  },
+
+  "auditing": {
+    "role":	    	"none",
+    "members":	    []
+  }
+}

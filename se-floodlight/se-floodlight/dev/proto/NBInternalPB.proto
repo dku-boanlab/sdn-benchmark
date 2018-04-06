@@ -1,0 +1,338 @@
+syntax = "proto2";
+
+option java_package = "org.openflow.northboundapi.proto";
+
+import "ValuesPB.proto";
+
+
+// Messages internal to the northbound API protocol.
+// These messages are strictly for managing sessions
+// between the client and server (controller) sides of
+// the northbound API.  They are neither used by
+// nor exposed to applications.
+
+message NBInternalMsgPB {
+
+  enum InternalMsgType {
+    Error               = 0;
+    Hello               = 1;
+    Welcome             = 2;
+    Goodbye             = 3;
+    AuthenRequest       = 4;
+    AuthenReply         = 5;
+    SetQueuePolicy      = 8;
+    SetQueuePolicyReply = 9;
+    Ping                = 10;
+    Extension           = 11;
+    ResendWelcome       = 12;	// No associated additional data; Only valid after authenticated.
+  }
+
+  required InternalMsgType               msgType                     = 1;
+
+  optional ErrorMessagePB                errorMessage                = 2;
+  optional HelloMessagePB                helloMessage                = 3;
+  optional WelcomeMessagePB              welcomeMessage              = 4;
+  optional GoodbyeMessagePB              goodbyeMessage              = 5;
+  optional AuthenRequestMessagePB        authenRequestMessage        = 6;
+  optional AuthenReplyMessagePB          authenReplyMessage          = 7;
+  optional SetQueuePolicyMessagePB       setQueuePolicyMessage       = 8;
+  optional SetQueuePolicyReplyMessagePB  setQueuePolicyReplyMessage  = 9;
+  optional PingMessagePB                 pingMessage                 = 10;
+  optional ExtensionMessagePB            extensionMessage            = 11;
+
+}
+
+// Enumerated values to be used for the subtype field of a StatusReplyPB when messageType is NBInternalType
+
+enum InternalStatusSubtypes {
+  AUTHENTICATION   = 1;
+  MESSAGE_DISPATCH = 2;
+  QUEUE_CONTROL    = 3;
+}
+
+// Enumerated reply status "code" values for QUEUE_CONTROL
+enum QueueControlStatusCodes {
+  InvalidLimitsRequest          = 1;
+  InvalidQueueDropPolicyRequest = 2;
+}
+
+
+// Error message definitions
+
+// The recipient of an unexpected or malformed error message MUST ignore the
+// message (preventing such error messages from pinging back and forth).
+
+message ErrorMessagePB {
+
+  enum ErrorType {
+    AUTHENTICATION_FAILURE  = 1;
+    OF_MSGS_DROPPED			= 3;
+    PROTOCOL_ERROR			= 4;
+    QUEUE_LIMIT_EXCEEDED	= 5;
+    UNSUPPORTED_REQUEST		= 6;
+    UNSUPPORTED_EXTENSION	= 7;
+    VERSION_MISMATCH		= 8;
+  }
+
+  required ErrorType             errorType           = 1;
+
+  optional int32                 authenErrorCode     = 2;
+  optional ExtensionMessagePB    offendingExtension  = 3;
+  optional OFMsgsDroppedInfoPB   ofMsgsDroppedInfo   = 4;
+  optional ProtocolErrorInfoPB   protocolErrorInfo   = 5;
+  optional VersionMismatchInfoPB versionMismatchInfo = 6;
+
+}
+
+message ProtocolErrorInfoPB {
+
+  enum ProtocolErrorType {
+    BAD_MESSAGE           = 1; // content issue: unknown message type, missing expected field, etc.
+    UNEXPECTED_MESSAGE    = 2; // message recognized, but inappropriate
+    STREAM_DECODE_FAILURE = 3; // stream decoder failed
+  }
+
+  required ProtocolErrorType protocolErrorType = 1;
+
+  // ProtocolErrorInfoPB messages of type BAD_MESSAGE and UNEXPECTED_MESSAGE
+  // should be accompanied by a StatusReplyPB with the offending packet.
+}
+
+message VersionMismatchInfoPB {
+
+  required uint32 minVersionNB = 1;
+  required uint32 maxVersionNB = 2;
+  required uint32 minVersionSB = 3;
+  required uint32 maxVersionSB = 4;
+
+}
+
+import "SBOFMessagesPB.proto";
+
+message OFMsgsDroppedInfoPB {
+
+  message OFMsgsCountPB {
+    required OFMessagePB.OFTypePB ofType = 1;
+    required uint32               count  = 2;
+  }
+
+  repeated OFMsgsCountPB ofMsgsCount = 1;
+
+}
+
+// Hello message definitions
+
+message HelloMessagePB {
+
+  required uint32                  versionNB		= 1;
+  required uint32                  versionSB		= 2;
+  required string                  clientID			= 3;
+  optional string                  programName		= 4;
+  optional SetQueuePolicyMessagePB initialPolicy	= 5;
+
+}
+
+// Welcome message definitions
+
+message WelcomeMessagePB {
+  required SetQueuePolicyReplyMessagePB currentQueuePolicy		= 1;
+  optional bytes                        ofCapabilities			= 2;	// array of OFType.types
+  repeated string                       ctlCapabilities			= 3;	// comma-delimited list
+  repeated string                       internalExtensionIDs	= 4;	// internal protocol extensions supported
+  repeated string                       controllerExtensionIDs	= 5;	// controller extensions supported
+}
+
+
+// Goodbye message definitions
+
+// If the Reason code for the goodbye message is "ERROR" then the
+// errorMessage field of the NBInternalMsgPB message may be present to
+// describe the error that caused the Goodbye message.
+
+message GoodbyeMessagePB {
+
+  enum Reason {
+    NONE     = 0;
+    OTHER    = 1;
+    ERROR    = 2;
+    REJECTED = 3;	// client connection passed authentication but was rejected by server
+    RESTART  = 4;	// controller restart
+    SHUTDOWN = 5;	// controller shutdown
+  }
+
+  required Reason reason = 1;
+
+}
+
+
+// AuthenRequest and AuthenReply message definitions
+
+// The server may require additional authentication for the specified client
+// identifier in the hello message.  If so, the server MUST send one or more
+// AuthenRequest messages PRIOR to a welcome message.  The request message may
+// contain more than one authentication element.  If the client can not
+// provide authentication for a mandatory element, the client SHOULD terminate
+// the connection.  The server MUST reject any connection that does not
+// provide a reply to a mandatory request element.  If more than one request
+// element in a message is not mandatory, the client may arbitrarily choose
+// one or more of the elements to send in the reply.  However, in such a case,
+// the client MUST choose at least one element in the response.  Thus,
+// mandatory elements of a message represent the "and" set, whereas the
+// non-mandatory elements represent the "or" set.  A server MUST NOT send an
+// AuthenRequest message with no elements (empty).  Likewise, a client MUST
+// NOT send an AuthenReply message with no elements (empty).  If a client can
+// not respond to the request, it SHOULD terminate the connection (anything
+// other than the correct response would yield a protocol error).
+
+// For each authentication element in a response, the client MUST identify
+// (i.e., transfer from the request) the authenType and fieldID the element is
+// in response to.
+
+// The authenType string is meant to uniquely identify the content scheme of
+// the authenData in both the request and the reply.  This "schema by
+// convention" strategy allows the authentication exchange to be extended
+// without requiring a redefinition of the GPB ".proto" file.
+
+// The following commentary describes predefined authenType values and the "by
+// convention" schemes they represent.  A client or server MAY elect to
+// implement these schemes, but MUST NOT use the specified authenType values
+// to describe a different scheme.
+
+// authenType of "simple_password"
+//    NOTE: because there is no encryption, this authenType is only suitable
+//    when using an encrypted channel (e.g., SSL) or when there is some other
+//    physical guarantee of privacy for the network connection.
+//
+//    The request authenData consists of an optional dictionary with elements
+//    that identify and/or describe a specific password challenge.
+//
+//    The response authenData consists of an "aString" field set to the plain
+//    text password.
+
+message AuthenRequestMessagePB {
+  message AuthenRequestPB {
+    required bool		mandatory	= 1;	// mandatory authentication request element.
+    required string		authenType	= 2;	// authentication request type.
+    required int32		fieldID		= 3;	// request field identifier
+    optional ValuePB	authenData	= 4;	// authentication request content.
+  }
+
+  repeated AuthenRequestPB	authenRequest	= 1;
+}
+
+message AuthenReplyMessagePB {
+  message AuthenReplyPB {
+    required string		authenType	= 1;	// authentication request type.
+    required int32		fieldID		= 2;	// request field identifier
+    optional ValuePB	authenData	= 3;	// authentication reply content.
+  }
+
+  repeated AuthenReplyPB	authenReply	= 1;
+}
+
+
+// SetQueuePolicy message definitions
+
+// The client may request a queueLimit that is less than or equal to
+// the value returned in the hello message.  The dropTo value must be
+// less than or equal to the queueLimit.  An implementation may have a
+// lower limit for either the queueLimit or the dropTo values (may not
+// be the same limit value for both).  An attempt to set either (or
+// both) of these values outside the allowed range will result in an
+// error return and the current values will remain unchanged.
+
+// When the dropPolicy field is present, the specified dropOrder will
+// replace the server's current dropOrder.  Note that the dropOrder
+// list may be empty, meaning no OF messages are to be dropped.  If
+// the dropPolicy field is not present, then the server's drop order
+// is unaffected.
+
+// When the server's output queue size exceeds the queueLimit value,
+// the server will first attempt to remove messages until the queue
+// size reaches the dropTo value.  It does so by looping over the OF
+// message types specified in the dropPolicy and removing messages from
+// the queue that match the OF message type, from oldest to newest.  A
+// count of the messages dropped (by type) is retained and is reported
+// (via a QUEUE_LIMIT_EXCEEDED Error message) as the next message sent
+// to the client (i.e., at the head of the queue, not the tail).  If
+// the queue does not reach the dropTo target size, the client
+// connection will be terminated.
+
+// QueueDrop (sub)message definition: To distinguish a not-specified
+// condition from a list is specified and it is empty condition.
+message QueueDropPB {
+  repeated OFMessagePB.OFTypePB dropOrder   = 1;
+}
+
+message SetQueuePolicyMessagePB {
+  optional uint32      queueLimit = 1;
+  optional uint32      dropTo     = 2;
+  optional QueueDropPB dropPolicy = 3;
+  optional uint32      requestID  = 4;  // If present in a request, MUST be propagated to the reply
+}
+
+// SetQueuePolicyReply message definition
+
+message SetQueuePolicyReplyMessagePB {
+  required uint32      queueLimit = 1;
+  required uint32      dropTo     = 2;
+  required QueueDropPB dropPolicy = 3;
+  optional uint32      requestID  = 4;  // From the request
+}
+
+
+// Ping request/reply message definition:
+
+// Ping messages MUST NOT be sent by either the client or the server
+// during validation (i.e., prior to the server sending a Welcome
+// message or prior to the client receiving a Welcome message).  A
+// ping message received prior to validation results in a protocol
+// error (goodbye + error and connection termination).
+
+// The receiver of a msgType of Ping MUST either ignore the message or send
+// an appropriate ping reply packet.  Any messages with a msgType of Ping
+// received after validation MUST NOT generate protocol errors.  The
+// receiver of a msgType of Ping containing a PingMessagePB component that
+// has the pingType set to PING_REQUEST SHOULD send a corresponding
+// PING_REPLY message with the requestID field set or unset to the same
+// value as the ping request message.  All other ping messages SHOULD be
+// ignored.
+
+message PingMessagePB {
+  enum PingType {
+    PING_REPLY   = 2;
+    PING_REQUEST = 1;
+  }
+
+  optional PingType    pingType  = 1;
+  optional uint32      requestID = 2;  // If present in a request, MUST be propagated to the reply
+
+}
+
+
+// Extension message definition:
+
+// A client using an extension request SHOULD only use an extensionID from the
+// list of supported IDs contained in the extensionIDsAvailable field of the
+// welcome message.  Any entity receiving an unsupported extensionID MUST
+// respond with an UNSUPPORTED_EXTENSION error message.  Extensions which
+// generate unsolicited messages SHOULD NOT set the requestID field (adding
+// such identifiers to the content is preferable).  In the unlikely event that
+// a server is making an extension request of a client or is sending
+// unsolicited extension messages, the server SHOULD discontinue use of that
+// extension upon receipt of a corresponding UNSUPPORTED_EXTENSION error
+// message from the client.  Any leading or trailing whitespace in an
+// extensionID MUST be ignored.  An extensionID MUST contain at least one
+// non-whitespace character.  Any entity receiving a message containing an
+// extensionID that is an empty string or consists solely of whitespace MUST
+// generate a protocol error in response.
+
+message ExtensionMessagePB {
+  required string  extensionID	= 1;	// Identifier from welcome's available ID list.
+  optional uint32  requestID	= 2;	// Requester-generated request tracking identifier (e.g., serial number)
+  optional ValuePB value		= 3;	// Extension content.
+}
+
+//Local Variables:
+//tab-width: 4
+//End:

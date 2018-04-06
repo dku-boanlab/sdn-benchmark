@@ -1,0 +1,69 @@
+
+			
+				<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+				<html>
+				<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+				<title>OpenFlow Northbound API</title>
+				</head>
+				<body>
+			
+			<h2>Overview</h2>
+
+<p>SRI's Northbound API has two components, (1) a floodlight-specific server module
+and (2) language-specific client libraries.  Clients communicate to the server
+via predefined (but specifiable) TCP ports using Google Protocol Buffer messages.</p>
+
+<h2>Server Configuration</h2>
+
+<p>The server settings are documented in</p>
+
+<ul>
+<li><a href="index.html?net/floodlightcontroller/northboundapi/server/AbstractNBListener.html" title="Server operation and plain communications configuration">AbstractNBListener</a>, for plain communications, and</li>
+<li><a href="index.html?net/floodlightcontroller/northboundapi/server/NBServerSSLSupport.html" title="Secure communications configuration">NBServerSSLSupport</a>, for SSH-based communications (see <a href="SecureCommunications.html" title="Secure communications certificate generation">SecureCommunications</a> for certificate generation).</li>
+</ul>
+
+<p>Note that the common prefix for the <code>runtime/config/floodlight.properties</code> keys is</p>
+
+<pre><code>    net.floodlightcontroller.security.northboundapi.server.SENorthboundAPI.
+</code></pre>
+
+<h2>Client Libraries</h2>
+
+<p>This distribution contains Java and Perl Northbound API client libraries, as well as the
+Google Protocol Buffer specifications upon which these libraries depend.</p>
+
+<h3>Java</h3>
+
+<p>For Java, the library is</p>
+
+<pre><code>    dev/java/ClientNBAPI.jar
+</code></pre>
+
+<p>where <a href="../../../dev/java/doc/index.html?OpenFlow/NBAPI/ControllerContext.html"><code>OpenFlow.NBAPI.ControllerContext</code></a> provides core library functionality.</p>
+
+<h3>Perl</h3>
+
+<p>For Perl, the modules reside in</p>
+
+<pre><code>    dev/perl
+</code></pre>
+
+<p>and <a href="../../../dev/perl/OpenFlow/NBAPI/ControllerContext.pm" title="Perl ControllerContext"><code>OpenFlow::NBAPI::ControllerContext</code></a> provides core library functionality.</p>
+
+<h3>Google Protocol Buffer Specifications</h3>
+
+<p>Finally, the Google Protocol Buffer specifications, which employ protobuf-2.5.0 syntax, reside in</p>
+
+<pre><code>    dev/proto
+</code></pre>
+
+<p>where <a href="../../../dev/proto/NorthboundAPIPB.proto"><code>NorthboundAPIPB.proto:MessagePB</code></a> is the root data structure.</p>
+
+			
+				<br>
+				<br>
+				<i>Last modified: Friday, 30-Jan-2015 11:09 PST</i>
+				</body>
+			
+			

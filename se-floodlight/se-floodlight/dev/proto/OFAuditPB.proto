@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+option java_package = "org.openflow.audit.proto";
+
+import "ValuesPB.proto";
+import "SBOFMessagesPB.proto";
+
+message OFAuditRecordPB {
+
+  enum StatusEnum {
+    INFO    = 1;
+    WARNING = 2;
+    ERROR	= 3;
+  }
+
+  required int64		   posixTime	= 1; // milliseconds since 1 January 1970
+  required string		   agentID		= 2; // agent class generating audit entry
+  optional string		   instanceID   = 3; // agent instance
+  optional StatusEnum      status       = 4;
+  optional ValuePB         detail       = 5;
+  optional SBOFMessagePB   sbOFMessage  = 6;
+
+}
+
+//Local Variables:
+//tab-width: 4
+//End:

@@ -1,0 +1,10 @@
+{
+  "$appPriv":	    ["ERROR", "ECHO_REQUEST", "FLOW_MOD", "PACKET_IN", "BARRIER_REQUEST",
+					 "GET_CONFIG_REQUEST", "QUEUE_GET_CONFIG_REQUEST",
+					 "FEATURES_REQUEST", "STATS_REQUEST"],
+
+  "$opPriv":	    ["$appPriv", "PACKET_OUT"],
+
+  "$adminPriv":	    ["$opPriv", "VENDOR",
+    		     	 "SET_CONFIG", "PORT_MOD"]
+}

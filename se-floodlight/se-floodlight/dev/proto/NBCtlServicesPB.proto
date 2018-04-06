@@ -1,0 +1,108 @@
+syntax = "proto2";
+
+option java_package = "org.openflow.northboundapi.proto";
+
+
+message NBCtlServicePB {
+
+  enum ServiceMsgType {
+    FunctionRequest = 1;
+    FunctionReply	= 2;
+  }
+
+  required uint32                     requestID                = 1;
+  required ServiceMsgType             msgType                  = 2;
+
+  optional FunctionRequestPB		  functionRequest		   = 3;
+  optional FunctionReplyPB			  functionReply			   = 4;
+
+}
+
+import "ValuesPB.proto";
+
+import "SBOFMatchesPB.proto";
+import "SBOFMessagesPB.proto";
+
+//  AddMatchFilters:
+//    Request: matchFilter+
+//    Reply:   -
+//    Note: Redundant adds only update the auxData field on the server
+//    with the new content.
+//
+//  QueryPermission
+//    Request: byteArray (OFMessagePB.OFTypePB)
+//	  Reply:   byteArray (OFMessagePB.OFTypePB)
+//	  Request is a list of protocol types, reply is the subset of
+//	  those types that are permitted by the controller.  Any
+//	  redundancies in the request list are ignored.  The return list
+//	  is not required to be in the same order as the request list.
+//
+//  ReceiveMessage
+//    Request: byteArray (OFMessagePB.OFTypePB)
+//    Reply:   -
+//    Adds each of the OpenFlow message types to the list of message
+//    types to receive for all switches (may need optional datapath ID
+//    specifier in future).
+//
+//  IgnoreMessage
+//    Request: byteArray (OFMessagePB.OFTypePB)
+//    Reply:   -
+//    Removes each of the OpenFlow message types from the list of
+//    message types to receive for all switches (may need optional
+//    datapath ID specifier in future).
+//
+//  RemoveMatchFilters:
+//    Request: matchFilter*
+//    Reply:   -
+//    If matchFilter list is empty, removes ALL match filters.
+//
+//  SwitchStatus
+//    Request: byteArray (OFSwitchStatusPB.SwitchStatusPB)
+//	  Reply:   -
+//
+//  SynchMessages
+//    Request: anInt64 (dpid)
+//    Reply:   -
+
+message FunctionRequestPB {
+  required string		requestType	= 1;
+  optional ValuePB		value		= 2;
+  repeated NBOFMatchPB	matchFilter	= 3;		// PACKET_IN filters
+}
+
+// NBOFMatchPB extends the SB match criteria for the controller context:
+//	sbOFMatch
+//		Required SB OpenFlow match criteria.
+//	datapathID
+//		Optional switch datapath identifier to match.  If unspecified,
+//		any managed switch packet source will match.
+//	pInReason
+//		Optional reason code match criteria.  The code enumerates
+//		reasons for the switch sending the packet to the controller:
+//		NO_MATCH meaning switch has no flow mod rule for this packet
+//		and ACTION meaning the controller inserted a flow mod rule
+//		specifically asking for the packet.  If unspecified, any
+//		reason code will match.
+//	auxData
+//		Auxiliary controller match data (not required on a remove).
+//		{'floodlight'={'packetIn.ACTION.STOP'=bool}}
+//			packetIn.ACTION.STOP is a boolean value.  If unspecified
+//			defaults to 'false'.  If set true, indicates that a filter
+//			match halts further dispatch of the packet within the
+//			controller (i.e., within the northbound API module and any
+//			"downstream" modules).
+
+message NBOFMatchPB {
+  required OFMatchPB			sbOFMatch	= 1;	// SB packet match criteria
+  optional uint64				datapathID	= 2;	// switch datapath identifier
+  optional OFPacketInReasonPB	pInReason	= 3;	// filter based on reason code
+  optional ValuePB				auxData		= 4;
+}
+
+message FunctionReplyPB {
+  optional ValuePB value = 1;
+}
+
+//Local Variables:
+//tab-width: 4
+//End:

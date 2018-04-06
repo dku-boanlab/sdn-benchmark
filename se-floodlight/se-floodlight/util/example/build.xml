@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="IRegisterSEModule Example">
+
+	<property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="ant.build.javac.target" value="1.6"/>
+    <property name="ant.build.javac.source" value="1.6"/>
+
+	<property name="root.location"		 location="../.."/>
+	<property name="rt.location"		 location="${root.location}/runtime"/>
+	<property name="SEFloodlight.jar"	 value="${rt.location}/SEFloodlight.jar"/>
+
+	<property name="src.location"		 location="."/>
+	<property name="nfli.cpath"			 value="net.floodlightcontroller.linkdiscovery.internal"/>
+	<property name="nfli.sclass"		 value="SELinkDiscoveryManager"/>
+	<property name="nfli.fclass"		 value="${nfli.cpath}.${nfli.sclass}"/>
+
+	<property name="build.target"		 value="${nfli.fclass}.cred"/>
+
+	<path id="packages.classpath">
+        <pathelement location="${SEFloodlight.jar}"/>
+    </path>
+
+	<path id="IRegisterSEModule.classpath">
+        <path refid="packages.classpath"/>
+    </path>
+
+	<target name="-init">
+        <mkdir dir="bin"/>
+    </target>
+
+	<target name="-compile">
+		<javac debug="true"
+			   debuglevel="${debuglevel}"
+			   destdir="bin"
+			   includeantruntime="false"
+			   verbose="no"
+			   updatedProperty="sourcesCompiled">
+			<classpath refid="IRegisterSEModule.classpath"/>
+            <src path="${src.location}"/>
+        </javac>
+
+		<condition property="build-project.notRequired">
+			<and>
+				<not>
+					<isset property="sourcesCompiled"/>
+				</not>
+				<available file="${build.target}"/>
+			</and>
+		</condition>
+	</target>
+
+	<macrodef name="makeCred">
+		<attribute name="class" default="NOT SET"/>
+		<attribute name="group" default="packetOut"/>
+		<sequential>
+			<echo message="Creating credential for @{class}"/>
+			<java classpath="${SEFloodlight.jar}" classname="SECredentialGenerator">
+		  		<arg line="-group @{group}"/>
+				<arg line="-cp bin"/>
+				<arg value="@{class}"/>
+				<arg value="-cred"/>
+			</java>
+		</sequential>
+	</macrodef>
+
+	<target name="-makeCred" unless="build-project.notRequired">
+		<makeCred class="${nfli.fclass}"/>
+	</target>
+
+	<!-- =================================
+          target: build
+         ================================= -->
+	<target name="build" depends="-init,-compile,-makeCred"
+		description="Compiles IRegisterSEModule example and creates its associated credential"
+	/>
+
+	<!-- =================================
+          target: clean
+         ================================= -->
+	<target name="clean"
+		description="Removes build artifacts"
+	>
+        <delete dir="bin"/>
+		<delete file="${build.target}"/>
+    </target>
+
+</project>
+
+<!-- Local Variables: -->
+<!-- tab-width: 4 -->
+<!-- End: -->

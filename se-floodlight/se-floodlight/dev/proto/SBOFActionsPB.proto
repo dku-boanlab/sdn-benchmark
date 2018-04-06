@@ -1,0 +1,96 @@
+syntax = "proto2";
+
+option java_package = "org.openflow.northboundapi.proto";
+
+
+message OFActionPB {
+
+  enum OFActionTypePB {
+    OUTPUT         = 0;      // OFActionOutput
+    SET_VLAN_ID    = 1;      // OFActionVirtualLanIdentifier
+    SET_VLAN_PCP   = 2;      // OFActionVirtualLanPriorityCodePoint
+    STRIP_VLAN     = 3;      // OFActionStripVirtualLan
+    SET_DL_SRC     = 4;      // OFActionDataLayerSource
+    SET_DL_DST     = 5;      // OFActionDataLayerDestination
+    SET_NW_SRC     = 6;      // OFActionNetworkLayerSource
+    SET_NW_DST     = 7;      // OFActionNetworkLayerDestination
+    SET_NW_TOS     = 8;      // OFActionNetworkTypeOfService
+    SET_TP_SRC     = 9;      // OFActionTransportLayerSource
+    SET_TP_DST     = 10;     // OFActionTransportLayerDestination
+    OPAQUE_ENQUEUE = 11;     // OFActionEnqueue
+    VENDOR         = 0xFFFF; // OFActionVendor
+  }
+
+  required OFActionTypePB						 actionType						   =  1;
+
+  optional OFActionOutputPB                      actionOutput					   =  2;
+  optional OFActionVirtualLanIdentifierPB        actionVirtualLanIdentifier		   =  3;
+  optional OFActionVirtualLanPriorityCodePointPB actionVirtualLanPriorityCodePoint =  4;
+  optional OFActionStripVirtualLanPB             actionStripVirtualLan			   =  5;
+  optional OFActionDataLayerSourcePB             actionDataLayerSource			   =  6;
+  optional OFActionDataLayerDestinationPB        actionDataLayerDestination		   =  7;
+  optional OFActionNetworkLayerSourcePB          actionNetworkLayerSource		   =  8;
+  optional OFActionNetworkLayerDestinationPB     actionNetworkLayerDestination	   =  9;
+  optional OFActionNetworkTypeOfServicePB        actionNetworkTypeOfService		   = 10;
+  optional OFActionTransportLayerSourcePB        actionTransportLayerSource		   = 11;
+  optional OFActionTransportLayerDestinationPB   actionTransportLayerDestination   = 12;
+  optional OFActionEnqueuePB                     actionEnqueue					   = 13;
+  optional OFActionVendorPB                      actionVendor					   = 14;
+}
+
+message OFActionOutputPB {
+  required uint32 port		= 1;
+  optional uint32 maxLength = 2 [default = 1600];
+}
+
+message OFActionVirtualLanIdentifierPB {
+  required uint32 virtualLanIdentifier = 1;
+}
+
+message OFActionVirtualLanPriorityCodePointPB {
+  required uint32 virtualLanPriorityCodePoint = 1;
+}
+
+message OFActionStripVirtualLanPB {
+}
+
+message OFActionDataLayerSourcePB {
+  required uint64 dataLayerAddress = 1;
+}
+
+message OFActionDataLayerDestinationPB {
+  required uint64 dataLayerAddress = 1;
+}
+
+message OFActionNetworkLayerSourcePB {
+  required uint32 networkAddress = 1;
+}
+
+message OFActionNetworkLayerDestinationPB {
+  required uint32 networkAddress = 1;
+}
+
+message OFActionNetworkTypeOfServicePB {
+  required uint32 networkTypeOfService = 1;
+}
+
+message OFActionTransportLayerSourcePB {
+  required uint32 transportPort = 1;
+}
+
+message OFActionTransportLayerDestinationPB {
+  required uint32 transportPort = 1;
+}
+
+message OFActionEnqueuePB {
+  required uint32 port	  = 1;
+  required uint32 queueId = 2;
+}
+
+message OFActionVendorPB {
+  required uint32 vendor = 1;
+}
+
+//Local Variables:
+//tab-width: 4
+//End:
