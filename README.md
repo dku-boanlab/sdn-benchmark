@@ -1,10 +1,10 @@
 # NOSs
-- Beacon  
+- Beacon (1.0.4)  
 - NOX  
 - POX (in Mininet)  
 - Ryu  
-- SE-Floodlight
-- ONOS
+- SE-Floodlight  
+- ONOS (1.13)
 
 # Network emulation
 - Mininet
