@@ -19,7 +19,8 @@ sudo apt-get install oracle-java8-installer oracle-java8-set-default -y
 
 cd ~
 
-git clone -b onos-1.13 https://github.com/opennetworkinglab/onos
+git clone https://github.com/opennetworkinglab/onos
+#git clone -b onos-1.12 https://github.com/opennetworkinglab/onos
 echo ". ~/onos/tools/dev/bash_profile" >> ~/.bashrc
 . ~/.bashrc
 
