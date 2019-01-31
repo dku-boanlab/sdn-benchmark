@@ -1,10 +1,10 @@
-# NOSs
+# NOSs (SDN controllers)
 - Beacon (1.0.4)  
 - NOX (requires gcc/g++-4.6)
 - POX (in Mininet)  
 - Ryu  
 - SE-Floodlight  
-- ONOS
+- ONOS (1.14)  
 
 # Network emulation
 - Mininet
