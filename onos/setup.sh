@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cp run_onos.sh ~
+
 mkdir ~/Downloads ~/Applications
 
 cd ~/Downloads
