@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# copy a new one to HOME
-cp -r se-floodlight ~
+# decompress SE-Floodlight
+tar xvfz SEFloodlight-beta7.tar.gz -C ~
 
 # move a running script to HOME
-mv ~/se-floodlight/run_sfl.sh ~
+cp run_sfl.sh ~
