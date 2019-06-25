@@ -9,17 +9,15 @@ cp -r nox/boost-1.46.1 ~/nox
 cp -r nox/nox ~/nox
 cp nox/run_nox.sh ~
 
-# install dependency (gcc-4.6)
+# install dependencies
 sudo apt-get -y install gcc-4.6 g++-4.6 autoconf
+sudo apt-get -y install build-essential python-dev libtbb-dev libssl-dev libtool twisted* libbz2-dev libicu-dev
 
 # temporarily change the gcc version
 sudo mv /usr/bin/gcc /usr/bin/gcc.bak
 sudo mv /usr/bin/g++ /usr/bin/g++.bak
 sudo ln -s /usr/bin/gcc-4.6 /usr/bin/gcc
 sudo ln -s /usr/bin/g++-4.6 /usr/bin/g++
-
-# install dependencies
-sudo apt-get -y install python-dev libtbb-dev libssl-dev libtool twisted* libbz2-dev libicu-dev
 
 # install boost
 cd ~/nox/boost-1.46.1/boost_1_46_1
