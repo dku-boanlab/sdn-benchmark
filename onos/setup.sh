@@ -5,18 +5,18 @@
 sudo apt-get install -y wget
 wget -P /tmp/ http://www.sdx4u.net/downloads/jdk-8u202-linux-x64.tar.gz
 
-sudo mkdir -p /usr/lib/jvm
-sudo tar xvfz /tmp/jdk-8u202-linux-x64.tar.gz -C /usr/lib/jvm/
+sudo mkdir -p /usr/lib/java
+sudo tar xvfz /tmp/jdk-8u202-linux-x64.tar.gz -C /usr/lib/java/
 
-echo "PATH=$PATH:/usr/lib/jvm/jdk1.8.0_202/bin" | sudo tee -a /etc/environment
-echo "JAVA_HOME=/usr/lib/jvm/jdk1.8.0_202/" | sudo tee -a /etc/environment
-echo "CLASSPATH=JAVA_HOME=/usr/lib/jvm/jdk1.8.0_202/lib" | sudo tee -a /etc/environment
+echo "PATH=$PATH:/usr/lib/java/jdk1.8.0_202/bin" | sudo tee -a /etc/environment
+echo "JAVA_HOME=/usr/lib/java/jdk1.8.0_202/" | sudo tee -a /etc/environment
+echo "JRE_HOME=$JAVA_HOME/jre" | sudo tee -a /etc/environment
 
 . /etc/environment
 
-sudo update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk1.8.0_202/bin/java" 1
-sudo update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/jdk1.8.0_202/bin/javac" 1
-sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/jdk1.8.0_202/bin/javaws" 1
+sudo update-alternatives --install "/usr/bin/java" "java" "/usr/lib/java/jdk1.8.0_202/bin/java" 1
+sudo update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/java/jdk1.8.0_202/bin/javac" 1
+sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/java/jdk1.8.0_202/bin/javaws" 1
 
 # ONOS
 
@@ -31,13 +31,8 @@ wget http://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.
 tar -zxvf apache-karaf-3.0.5.tar.gz -C ~/Applications/
 tar -zxvf apache-maven-3.3.9-bin.tar.gz -C ~/Applications/
 
-sudo apt-get install software-properties-common -y
-sudo add-apt-repository ppa:webupd8team/java -y
-
 sudo apt-get update
-sudo apt-get install git zip unzip -y
-echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections && \
-sudo apt-get install oracle-java8-installer oracle-java8-set-default -y
+sudo apt-get install git zip unzip python -y
 
 cd ~
 
