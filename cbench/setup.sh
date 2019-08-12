@@ -5,6 +5,7 @@ cp -r openflow ~
 
 if [ -z $1 ]; then
 	echo "$0 [ orig | real ]"
+	exit
 elif [ "$1" == "orig" ]; then
 	rm -rf ~/oflops
 	cp -r oflops ~
