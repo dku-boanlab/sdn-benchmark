@@ -4,9 +4,11 @@ rm -rf ~/openflow
 cp -r openflow ~
 
 if [ -z $1 ]; then
+	echo "$0 [ orig | real ]"
+elif [ "$1" == "orig" ]; then
 	rm -rf ~/oflops
 	cp -r oflops ~
-else
+elif [ "$1" == "real" ]; then
 	rm -rf ~/oflops
 	cp -r oflops-real ~/oflops
 fi
