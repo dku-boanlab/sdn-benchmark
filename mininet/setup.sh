@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo apt-get install -y python-pip
+pip install setuptools
+
 CUR=$(pwd)
 
 cd ~

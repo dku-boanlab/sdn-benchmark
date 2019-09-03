@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo apt-get install -y libsnmp-dev libpcap-dev libconfig-dev
+
 rm -rf ~/openflow
 cp -r openflow ~
 
@@ -17,6 +19,6 @@ fi
 cd ~/oflops
 
 ./boot.sh
-./configure
+./configure --with-openflow-src-dir=~/openflow
 make
 sudo make install
