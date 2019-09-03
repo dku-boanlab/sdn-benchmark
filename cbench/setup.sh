@@ -1,5 +1,6 @@
 #!/bin/bash
 
+sudo apt-get install -y dh-autoreconf autotools-dev pkg-config libc6-dev
 sudo apt-get install -y libsnmp-dev libpcap-dev libconfig-dev
 
 rm -rf ~/openflow
