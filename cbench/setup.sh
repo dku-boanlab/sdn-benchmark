@@ -19,6 +19,6 @@ fi
 cd ~/oflops
 
 ./boot.sh
-./configure --with-openflow-src-dir=~/openflow
+./configure --with-openflow-src-dir=$HOME/openflow
 make
 sudo make install
