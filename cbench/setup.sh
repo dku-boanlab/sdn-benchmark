@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# install dependencies
 sudo apt-get install -y dh-autoreconf autotools-dev pkg-config libc6-dev
 sudo apt-get install -y libsnmp-dev libpcap-dev libconfig-dev
 
@@ -19,6 +20,7 @@ fi
 
 cd ~/oflops
 
+# install cbench
 ./boot.sh
 ./configure --with-openflow-src-dir=$HOME/openflow
 make

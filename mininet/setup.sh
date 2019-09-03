@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# install dependencies
 sudo apt-get install -y python-pip
 pip install setuptools
 
