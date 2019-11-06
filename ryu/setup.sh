@@ -6,6 +6,7 @@ sudo pip install setuptools
 sudo pip install -U netaddr six pbr rfc3986 stevedore debtcollector oslo.i18n greenlet
 
 # then install ryu using pip
+sudo pip install tinyrpc==1.0.0
 sudo pip install ryu
 
 # copy the running script to HOME
