@@ -3,7 +3,7 @@
 # Oracle java 8
 
 sudo apt-get install -y wget
-wget -P /tmp/ http://www.sdx4u.net/downloads/jdk-8u202-linux-x64.tar.gz
+wget -P /tmp/ http://www.sdxdata.com/downloads/jdk-8u202-linux-x64.tar.gz
 
 sudo mkdir -p /usr/lib/java
 sudo tar xvfz /tmp/jdk-8u202-linux-x64.tar.gz -C /usr/lib/java/
