@@ -9,5 +9,5 @@
 # Network emulation
 - Mininet
 
-# Performance benchmark
+# Controller benchmark
 - Cbench
