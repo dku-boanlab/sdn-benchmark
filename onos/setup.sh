@@ -30,7 +30,7 @@ echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" |
 curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 
 sudo apt-get update
-sudo apt-get install bazel-1.2.1 -y
+sudo apt-get install bazel bazel-1.2.1 -y
 
 cd ~
 
