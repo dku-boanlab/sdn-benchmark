@@ -23,26 +23,26 @@ sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/java/jdk
 
 cp run_onos.sh ~
 
-mkdir ~/Downloads ~/Applications
+sudo apt-get update
+sudo apt-get install git zip unzip curl python -y
 
-cd ~/Downloads
-
-wget http://archive.apache.org/dist/karaf/3.0.5/apache-karaf-3.0.5.tar.gz
-wget http://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
-tar -zxvf apache-karaf-3.0.5.tar.gz -C ~/Applications/
-tar -zxvf apache-maven-3.3.9-bin.tar.gz -C ~/Applications/
+echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 
 sudo apt-get update
-sudo apt-get install git zip unzip python -y
+sudo apt-get install bazel-1.2.1 -y
 
 cd ~
 
-git clone -b onos-1.14 https://github.com/opennetworkinglab/onos
-echo ". ~/onos/tools/dev/bash_profile" >> ~/.bashrc
+git clone -b onos-1.15 https://github.com/opennetworkinglab/onos
+
+cat << EOF >> ~/.bashrc
+
+export ONOS_ROOT="`pwd`/onos"
+source \$ONOS_ROOT/tools/dev/bash_profile
+EOF
+
 . ~/.bashrc
 
 cd ~/onos
-tools/build/onos-buck build onos --show-output
-
-#tools/test/bin/onos localhost
-#mvn clean install
+bazel build onos
