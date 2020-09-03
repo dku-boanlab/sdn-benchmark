@@ -3,13 +3,15 @@
 CURR=`pwd`
 
 # first install dependencies
-sudo apt-get -y install python-dev python-pip
+sudo apt-get -y install gcc python-dev python-pip libffi-dev libssl-dev libxml2-dev libxslt1-dev zlib1g-dev
 
 cd ~
 
 # then install ryu
-git clone -b v4.34 https://github.com/faucetsdn/ryu.git
-cd ryu; pip install .
+git clone https://github.com/faucetsdn/ryu.git
+cd ryu; git checkout -b v4.34
+pip install .
+pip install -r tools/optional-requires
 
 cd $CURR
 
